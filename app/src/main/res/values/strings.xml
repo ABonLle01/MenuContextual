@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ejercicio6kotlin</string>
+    <string name="app_name">ejercicio6Kotlin</string>
+    <string name="recargar">Recargar</string>
+    <string name="limpiar">Limpiar</string>
 </resources>
