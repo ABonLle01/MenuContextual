@@ -1,16 +1,18 @@
 package com.example.ejercicio6kotlin
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.ejercicio6kotlin.ComunidadProvider.Companion.listasComunidad
 import com.example.ejercicio6kotlin.databinding.ActivityMainBinding
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -85,6 +87,38 @@ class MainActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
+    override fun onContextItemSelected(item: MenuItem): Boolean {
 
+        lateinit var comunidadAfectada:Comunidad
+        lateinit var miIntent:Intent
+
+        when(item.itemId){
+            0-> {
+                val alert=
+                    AlertDialog.Builder(this).setTitle("Eliminar ${comunidadAfectada.nombre}")
+                        .setMessage(
+                            "¿Estas seguro de que quieres eliminar ${comunidadAfectada.nombre}?"
+                        )
+                        .setNeutralButton("Cerrar",null).setPositiveButton(
+                            "Aceptar"
+                        ){_,_ ->
+                            display("Se ha eliminado ${comunidadAfectada.nombre}")
+                            listasComunidad.removeAt(item.groupId)
+                            adapter.notifyItemRemoved(item.groupId)
+                            adapter.notifyItemRangeChanged(item.groupId, listasComunidad.size)
+                            binding.rvComunidades.adapter = ComunidadAdapter(listasComunidad){
+                                comunidad->onItemSelected(comunidad)
+                            }
+                        }.create()
+                alert.show()
+            }
+            else->return super.onContextItemSelected(item)
+        }
+        return true
+    }
+
+    private fun display(message: String) {
+        Snackbar.make(binding.root,message,Snackbar.LENGTH_SHORT).show()
+    }
 
 }
