@@ -1,3 +1,3 @@
 package com.example.ejercicio6kotlin
 
-data class Comunidad(val nombre:String, val imagen:Int)
+data class Comunidad(var nombre:String, val imagen:Int)

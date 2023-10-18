@@ -2,4 +2,7 @@
     <string name="app_name">ejercicio6Kotlin</string>
     <string name="recargar">Recargar</string>
     <string name="limpiar">Limpiar</string>
+    <string name="cambiar">Cambiar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="sampletext">sampleText</string>
 </resources>

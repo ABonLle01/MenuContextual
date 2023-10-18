@@ -4,7 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -19,6 +24,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: ComunidadAdapter
     private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var intentLaunch:ActivityResultLauncher<Intent>
+
 
     private val copiaLista: MutableList<Comunidad> = mutableListOf()
 
@@ -31,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.rvComunidades.layoutManager = LinearLayoutManager(this)
 
-        binding.rvComunidades.adapter = ComunidadAdapter(ComunidadProvider.listasComunidad){
+        binding.rvComunidades.adapter = ComunidadAdapter(listasComunidad){
                 comunidad -> onItemSelected(comunidad)
         }
 
@@ -46,6 +53,18 @@ class MainActivity : AppCompatActivity() {
         binding.rvComunidades.layoutManager = layoutManager
 
         copiaLista.addAll(listasComunidad)
+
+        intentLaunch = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                val nombre = result.data?.extras?.getString("nombre")
+                if (!nombre.isNullOrBlank()) {
+                    val comunidadAfectada = listasComunidad[result.data?.extras?.getInt("position") ?: -1]
+                    comunidadAfectada.nombre = nombre
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
     }
 
     private fun onItemSelected(comunidad: Comunidad) {
@@ -97,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                 val alert=
                     AlertDialog.Builder(this).setTitle("Eliminar ${comunidadAfectada.nombre}")
                         .setMessage(
-                            "¿Estas seguro de que quieres eliminar ${comunidadAfectada.nombre}?"
+                            "¿Estás seguro de que quieres eliminar ${comunidadAfectada.nombre}?"
                         )
                         .setNeutralButton("Cerrar",null).setPositiveButton(
                             "Aceptar"
@@ -113,13 +132,28 @@ class MainActivity : AppCompatActivity() {
                 alert.show()
             }
 
-            1->{
-                val alert=
-                    AlertDialog.Builder(this).setTitle("Editar ${comunidadAfectada.nombre}")
+            1 -> {
+                val alertDialog = AlertDialog.Builder(this).setTitle("Editar $comunidadAfectada")
+                val input = EditText(this)
+                input.setText(comunidadAfectada.nombre)
 
+                alertDialog.setView(input)
 
-                alert.show()
+                alertDialog.setPositiveButton("Guardar") { _, _ ->
+                    val nuevoNombre = input.text.toString()
+                    comunidadAfectada.nombre = nuevoNombre
+                    adapter.notifyDataSetChanged()
+
+                }
+
+                alertDialog.setNegativeButton("Cancelar") { dialog, _ ->
+                    dialog.cancel()
+                }
+
+                alertDialog.show()
             }
+
+
 
             else->return super.onContextItemSelected(item)
         }
