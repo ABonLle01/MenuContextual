@@ -29,6 +29,7 @@ class ComunidadViewHolder(view: View):ViewHolder(view), View.OnCreateContextMenu
     ) {
         menu!!.setHeaderTitle(comunidad.nombre)
         menu.add(this.adapterPosition,0,0,"Eliminar")
+        menu.add(this.adapterPosition,1,1,"Editar")
     }
 
 }

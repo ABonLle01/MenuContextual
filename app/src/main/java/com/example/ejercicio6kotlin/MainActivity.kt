@@ -112,6 +112,15 @@ class MainActivity : AppCompatActivity() {
                         }.create()
                 alert.show()
             }
+
+            1->{
+                val alert=
+                    AlertDialog.Builder(this).setTitle("Editar ${comunidadAfectada.nombre}")
+
+
+                alert.show()
+            }
+
             else->return super.onContextItemSelected(item)
         }
         return true
