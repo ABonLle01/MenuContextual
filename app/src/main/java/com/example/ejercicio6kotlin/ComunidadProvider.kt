@@ -3,7 +3,7 @@ package com.example.ejercicio6kotlin
 class ComunidadProvider {
     companion object{
 
-        val listasComunidad= mutableListOf(
+        var listasComunidad= mutableListOf(
             Comunidad("Andalucía",R.drawable.andalucia),
             Comunidad("Aragón",R.drawable.aragon),
             Comunidad("Asturias",R.drawable.asturias),

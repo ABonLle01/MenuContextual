@@ -1,7 +1,9 @@
 package com.example.ejercicio6kotlin
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
@@ -24,8 +26,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: ComunidadAdapter
     private lateinit var layoutManager: LinearLayoutManager
-    private lateinit var intentLaunch:ActivityResultLauncher<Intent>
 
+    private lateinit var intentLaunch:ActivityResultLauncher<Intent>
+    private var imagen=0
+    private var nombre=""
 
     private val copiaLista: MutableList<Comunidad> = mutableListOf()
 
@@ -55,15 +59,22 @@ class MainActivity : AppCompatActivity() {
         copiaLista.addAll(listasComunidad)
 
         intentLaunch = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            if (result.resultCode == RESULT_OK) {
-                val nombre = result.data?.extras?.getString("nombre")
-                if (!nombre.isNullOrBlank()) {
-                    val comunidadAfectada = listasComunidad[result.data?.extras?.getInt("position") ?: -1]
-                    comunidadAfectada.nombre = nombre
+
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                if (data != null) {
+                    nombre=result.data?.extras?.getString("nombre").toString()
+
+                    data.getIntExtra("position", -1)?.takeIf { it >= 0 }?.let { validPosition ->
+                        listasComunidad.getOrNull(validPosition)?.nombre = nombre
+                    }
+
                     adapter.notifyDataSetChanged()
                 }
             }
         }
+
+
 
     }
 
@@ -73,6 +84,8 @@ class MainActivity : AppCompatActivity() {
             "Has pulsado sobre ${comunidad.nombre}",
             Toast.LENGTH_SHORT
         ).show()
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -102,14 +115,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun recargar() {
-        listasComunidad.addAll(copiaLista)
+        copiaLista.addAll(listasComunidad)
         adapter.notifyDataSetChanged()
     }
 
+
     override fun onContextItemSelected(item: MenuItem): Boolean {
 
-        lateinit var comunidadAfectada:Comunidad
-        lateinit var miIntent:Intent
+        var comunidadAfectada:Comunidad= listasComunidad[item.groupId]
+        var intent = Intent()
 
         when(item.itemId){
             0-> {
@@ -118,9 +132,8 @@ class MainActivity : AppCompatActivity() {
                         .setMessage(
                             "¿Estás seguro de que quieres eliminar ${comunidadAfectada.nombre}?"
                         )
-                        .setNeutralButton("Cerrar",null).setPositiveButton(
-                            "Aceptar"
-                        ){_,_ ->
+                        .setNeutralButton("Cerrar",null)
+                        .setPositiveButton("Aceptar"){_,_ ->
                             display("Se ha eliminado ${comunidadAfectada.nombre}")
                             listasComunidad.removeAt(item.groupId)
                             adapter.notifyItemRemoved(item.groupId)
@@ -151,6 +164,13 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 alertDialog.show()
+
+
+                intent.putExtra("nombre", comunidadAfectada.nombre)
+                intent.putExtra("imagen", comunidadAfectada.imagen)
+                intent.putExtra("position", listasComunidad.indexOf(comunidadAfectada))
+                intentLaunch.launch(intent)
+
             }
 
 
