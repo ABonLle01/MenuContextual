@@ -27,10 +27,15 @@ class ActivityDos:AppCompatActivity(), View.OnClickListener {
 
         val btnGuardar=findViewById<Button>(R.id.bCambiar)
         btnGuardar.setOnClickListener{
-            val intent=Intent()
+            val intent=Intent(this,ActivityDos::class.java)
             val nuevoNombre = etNombre.text.toString()
             intent.putExtra("nombre",nuevoNombre)
             setResult(RESULT_OK, intent)
+            finish()
+        }
+
+        val btnCancelar = findViewById<Button>(R.id.bCancelar)
+        btnCancelar.setOnClickListener {
             finish()
         }
 
@@ -38,12 +43,10 @@ class ActivityDos:AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(p0: View?) {
-//        val intent = Intent(this,ActivityDos::class.java)
+//        val intent = Intent()
 //        intent.putExtra("imagen",image)
 //        intent.putExtra("nombre",name)
 //        intentLaunch.launch(intent)
     }
 
 }
-
-

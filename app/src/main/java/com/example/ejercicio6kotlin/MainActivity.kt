@@ -31,7 +31,8 @@ class MainActivity : AppCompatActivity() {
     private var imagen=0
     private var nombre=""
 
-    private val copiaLista: MutableList<Comunidad> = mutableListOf()
+
+    private lateinit var copiaLista: MutableList<Comunidad>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +57,9 @@ class MainActivity : AppCompatActivity() {
         layoutManager = LinearLayoutManager(this)
         binding.rvComunidades.layoutManager = layoutManager
 
+        copiaLista = mutableListOf()
         copiaLista.addAll(listasComunidad)
+
 
         intentLaunch = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
 
@@ -111,19 +114,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun limpiar(){
         listasComunidad.clear()
+
         adapter.notifyDataSetChanged()
     }
 
     private fun recargar() {
-        copiaLista.addAll(listasComunidad)
+        listasComunidad.clear()
+        listasComunidad.addAll(copiaLista)
+
         adapter.notifyDataSetChanged()
     }
 
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
 
-        var comunidadAfectada:Comunidad= listasComunidad[item.groupId]
-        var intent = Intent()
+        val comunidadAfectada:Comunidad= listasComunidad[item.groupId]
+        val intent = Intent(this,ActivityDos::class.java)
 
         when(item.itemId){
             0-> {
@@ -146,25 +152,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             1 -> {
-                val alertDialog = AlertDialog.Builder(this).setTitle("Editar $comunidadAfectada")
-                val input = EditText(this)
-                input.setText(comunidadAfectada.nombre)
-
-                alertDialog.setView(input)
-
-                alertDialog.setPositiveButton("Guardar") { _, _ ->
-                    val nuevoNombre = input.text.toString()
-                    comunidadAfectada.nombre = nuevoNombre
-                    adapter.notifyDataSetChanged()
-
-                }
-
-                alertDialog.setNegativeButton("Cancelar") { dialog, _ ->
-                    dialog.cancel()
-                }
-
-                alertDialog.show()
-
 
                 intent.putExtra("nombre", comunidadAfectada.nombre)
                 intent.putExtra("imagen", comunidadAfectada.imagen)
