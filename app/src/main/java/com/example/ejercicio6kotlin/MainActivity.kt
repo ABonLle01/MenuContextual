@@ -3,14 +3,11 @@ package com.example.ejercicio6kotlin
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +28,8 @@ class MainActivity : AppCompatActivity() {
     private var imagen=0
     private var nombre=""
 
-    private val copiaLista: MutableList<Comunidad> = mutableListOf()
+
+    private var copiaLista: MutableList<Comunidad> = mutableListOf()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +54,9 @@ class MainActivity : AppCompatActivity() {
         layoutManager = LinearLayoutManager(this)
         binding.rvComunidades.layoutManager = layoutManager
 
+
         copiaLista.addAll(listasComunidad)
+
 
         intentLaunch = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
 
@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.Recarga -> {
+                limpiar()
                 recargar()
                 true
             }
@@ -111,19 +112,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun limpiar(){
         listasComunidad.clear()
+
         adapter.notifyDataSetChanged()
     }
 
     private fun recargar() {
-        copiaLista.addAll(listasComunidad)
+        listasComunidad.addAll(copiaLista)
+
         adapter.notifyDataSetChanged()
     }
 
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
 
-        var comunidadAfectada:Comunidad= listasComunidad[item.groupId]
-        var intent = Intent()
+        val comunidadAfectada:Comunidad= listasComunidad[item.groupId]
+        val intent = Intent(this,ActivityDos::class.java)
 
         when(item.itemId){
             0-> {
@@ -139,32 +142,13 @@ class MainActivity : AppCompatActivity() {
                             adapter.notifyItemRemoved(item.groupId)
                             adapter.notifyItemRangeChanged(item.groupId, listasComunidad.size)
                             binding.rvComunidades.adapter = ComunidadAdapter(listasComunidad){
-                                comunidad->onItemSelected(comunidad)
+                                    comunidad->onItemSelected(comunidad)
                             }
                         }.create()
                 alert.show()
             }
 
             1 -> {
-                val alertDialog = AlertDialog.Builder(this).setTitle("Editar $comunidadAfectada")
-                val input = EditText(this)
-                input.setText(comunidadAfectada.nombre)
-
-                alertDialog.setView(input)
-
-                alertDialog.setPositiveButton("Guardar") { _, _ ->
-                    val nuevoNombre = input.text.toString()
-                    comunidadAfectada.nombre = nuevoNombre
-                    adapter.notifyDataSetChanged()
-
-                }
-
-                alertDialog.setNegativeButton("Cancelar") { dialog, _ ->
-                    dialog.cancel()
-                }
-
-                alertDialog.show()
-
 
                 intent.putExtra("nombre", comunidadAfectada.nombre)
                 intent.putExtra("imagen", comunidadAfectada.imagen)
